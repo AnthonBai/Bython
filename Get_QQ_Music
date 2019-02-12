@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# @Author: kjjdas
-# @Date:   2018-08-19 15:21:36
+# @Author: Anthoy
 # @Last Modified time: 2019-02-12 07:50:22
 import requests
 import urllib
