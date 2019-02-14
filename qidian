@@ -1,0 +1,41 @@
+import requests
+from lxml import etree
+import os
+
+
+class Spider(object):
+    def start_request(self):
+        headers={
+        'User-Agent':'Mozilla/5.0 Chrome/52.0.2743 Safari/537.36'
+	}
+        response = requests.get('https://www.qidian.com/all', headers = headers)
+        html = etree.HTML(response.text)
+        Bigtit_list = html.xpath('//div[@class="book-mid-info"]/h4/a/text()')
+        Bigsrc_list = html.xpath('//div[@class="book-mid-info"]/h4/a/@href')
+        #print(Bigtit_list,Bigsrc_list)
+        for Bigtit, Bigsrc in zip(Bigtit_list, Bigsrc_list):
+            if os.path.exists(Bigtit) == False:
+                os.mkdir(Bigtit)
+            self.file_data(Bigtit,Bigsrc)
+
+    def file_data(self, Bigtit, Bigsrc):
+        response = requests.get("http:"+Bigsrc)
+        html = etree.HTML(response.text)
+        little_list = html.xpath('//ul[@class="cf"]/li/a/text()')
+        little_src = html.xpath('//ul[@class="cf"]/li/a/@href')
+        for Littit, litsrc in zip(little_list, little_src):
+            self.final_file(Littit,litsrc,Bigtit)
+
+    def final_file(self,Littit,litsrc,Bigtit):
+        response = requests.get("http:"+litsrc)
+        html = etree.HTML(response.text)
+        content = "\n".join(html.xpath('//div[@class="read-content j_readContent"]/p/text()'))
+        file_name = Bigtit + "\\"+Littit+".txt"
+        print("正在保存文件:"+file_name)
+        with open(file_name,"a",encoding="utf-8") as f:
+            f.write(content)
+
+
+
+spider = Spider()
+spider.start_request()
