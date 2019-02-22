@@ -1,0 +1,32 @@
+import json
+import requests
+from lxml import etree
+import jsonpath
+
+album_id = input('请输入喜马拉雅专辑编号：')
+url = 'https://www.ximalaya.com/revision/play/album?albumId=%s&pageNum=1&sort=0&pageSize=30'%(album_id)
+
+'''
+headers = {'Accept':'*/*',
+           'Accept-Encoding':'identity;q=1, *;q=0',
+           'Host': 'audio.xmcdn.com',
+           'Range':'bytes=0-',
+           'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.26 Safari/537.36 Core/1.63.5603.400 QQBrowser/10.1.1775.400',
+            'Connection': 'keep-alive',
+           }
+           '''
+headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.62 Safari/537.36",
+           }
+print(url,headers)
+json_data = requests.get(url=url, headers=headers)
+data = json.loads(json_data.text)
+#print(data)
+src_list = jsonpath.jsonpath(data,"$..src")
+title_list = jsonpath.jsonpath(data,"$..trackName")
+for (title, src) in zip(title_list, src_list):
+    print("%s:%s" % (title, src))
+    audio = requests.get(url=src, headers=headers).content
+    with open('mp3/%s.m4a'%title, 'ab') as f:
+        f.write(audio)
+
+
