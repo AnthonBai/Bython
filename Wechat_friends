@@ -1,0 +1,113 @@
+import itchat
+import wordcloud
+import os
+import sys
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+def get_friends():
+    friends = itchat.get_friends(update=True)[1:]#第1个0是自己
+    return friends
+
+def get_friendSex(friends):
+    Sex = {'male':0,'female':0,'other':0}
+    for f in friends:
+        if f['Sex'] == 1:
+            Sex['male'] +=1
+        elif f['Sex']==2:
+            Sex['female'] +=1
+        else:
+            Sex['other'] +=1
+    return Sex
+
+def get_friendLocation(friends):
+    #Location = []
+    Location = {}
+    for f in friends:
+        if f['Province']:#如果不为空
+            if f['Province'] not in Location:#确保没有重复
+                #Location.append(f['City'])
+                Location[f['Province']]=1
+                
+            else:
+                Location[f['Province']] += 1#统计同城人数
+                
+        '''elif f['Province']:
+            Location.append(f['Province'])
+        else:
+            Location.append(None)'''
+    return Location
+
+
+def get_Signature(friends):
+    #Signature = []
+    for i in friends:
+        if i['Signature']:
+            non_bmp_map = dict.fromkeys(range(0x10000, sys.maxunicode + 1), 0xfffd)
+            TransedSignature=i['Signature'].translate(non_bmp_map)
+            TransedNickName=i['NickName'].translate(non_bmp_map)
+            print('%s的签名：%s'%(TransedNickName,TransedSignature))
+            #Signature.append(TransedSignature)
+    #return Signature
+        
+
+def get_HeadImage(friends):
+    if 'HeadImag' not in os.listdir():#如果没有该文件夹则创建
+        os.mkdir('HeadImag')
+    os.chdir('HeadImag')
+
+    for f in friends:
+        img = itchat.get_head_img(userName=f['UserName'])
+        NickName = f['NickName'].replace('/','')
+        NickName = NickName.replace('|','')
+        NickName = NickName.replace('\\','')
+        NickName = NickName.replace('*','')
+        NickName = NickName.replace('?','？')
+        NickName = NickName.replace(':','：')
+        NickName = NickName.replace('>','')
+        NickName = NickName.replace('<','')                            
+        non_bmp_map = dict.fromkeys(range(0x10000, sys.maxunicode + 1), 0xfffd)
+        NickName=NickName.translate(non_bmp_map)#UnicodeEncodeError: 'UCS-2' codec can't encode characters in position 16-16: Non-BMP character not supported in Tk 
+        
+        with open(NickName + '.jpg', 'wb') as f:
+            
+            print('正在保存头像%s.jpg'%(NickName))
+            f.write(img)
+
+        
+
+if __name__ == '__main__':
+    itchat.auto_login(hotReload=True)#30分钟内自动保持连接无需登录
+    friends = get_friends()
+    Sex = get_friendSex(friends)
+    male = Sex['male']
+    female = Sex['female']
+    other = Sex['other']
+    print("male:%d\nfemale:%d\nother:%d" % (male,female,other))
+    Location = get_friendLocation(friends)
+    get_friendLocation
+
+    #get_HeadImage(friends)
+    #get_Signature(friends)
+
+city_num = Location.values()
+cities = Location.keys()
+plt.figure(figsize=(55,15),dpi=80)
+mpl.rcParams['font.sans-serif'] = ['SimSun']
+plt.bar(range(len(Location)),city_num, width = 0.2)
+plt.xticks(range(len(Location)),cities,rotation=75)
+plt.xlabel("微信好友所在城市", fontsize=16)
+plt.ylabel("位于同一城市微信好友数量", fontsize=16)
+
+for x,y in enumerate(city_num):
+    plt.text(x,y+10,'%s'%(y),ha='center',va='top')
+
+
+
+plt.show()
+
+ 
+
+
+    
