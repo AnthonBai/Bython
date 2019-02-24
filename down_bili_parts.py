@@ -38,7 +38,7 @@ for i in range(start_no, end_no):
         print('共%d段，'%(len(f_url)),end='')
     sub_no1=sub_no-1#删除子视频列表指定索引的元素,列表索引从0开始，因此应在用户输入值基础上减1
     #print(sub_no)
-    f_url = f_url[sub_no1:]
+    f_url2 = f_url[sub_no1:]
     #print('将要下载%d条url'%(f_url))
     print('将要下载%d段'%(len(f_url)))
     #print(f_url)
