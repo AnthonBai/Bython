@@ -1,0 +1,18 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Feb 26 12:14:28 2019
+
+@author: Bython
+#批量修改"*2.mp4"文件名为"*1.mp3"
+"""
+import os
+path = input('请输入文件路径：')
+path = path + '/'
+f = os.listdir(path)
+for i in f:
+    
+    if '2.mp4' in i:
+        newname=i[0:-5]+'1.mp3'
+        print('正在将%s重命名为%s'%(i,newname))
+        os.rename('%s%s'%(path,i),'%s%s'%(path,newname))       
+print('操作成功')    
